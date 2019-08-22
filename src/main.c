@@ -18,22 +18,23 @@
 
 #include "libft.h"
 
-int main()
+int	main(void)
 {
-	unsigned char* msg = (unsigned char*)"The quick brown fox jumps over the lazy dog";
-	size_t len = ft_strlen((char*)msg);
-	size_t padded_length;
+	unsigned char	*msg;
+	size_t			len;
+	size_t			padded_length;
+	unsigned char	*padded_message;
+	unsigned char	*bytes;
 
-	unsigned char* padded_message = add_message_padding(msg, len,
-		&padded_length, MD5_BLOCK_SIZE);
-
-	unsigned char* bytes = md5(padded_message, padded_length);
-
-	for(int i = 0; i < 16; ++i)
+	msg = (unsigned char*)"The quick brown fox jumps over the lazy dog";
+	len = ft_strlen((char*)msg);
+	padded_message = add_message_padding(msg, len,
+			&padded_length, MD5_BLOCK_SIZE);
+	bytes = md5(padded_message, padded_length);
+	for (int i = 0; i < 16; ++i)
 	{
 		printf("%2.2x", bytes[i]);
 	}
 	printf("\n");
-
-	return(0);
+	return (0);
 }

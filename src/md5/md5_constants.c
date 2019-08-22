@@ -12,9 +12,9 @@
 
 #include "md5.h"
 
-word*	md5_get_constants()
+t_word	*md5_get_constants(void)
 {
-	static word	s_constants[] = {
+	static t_word	s_constants[] = {
 			0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee,
 			0xf57c0faf, 0x4787c62a, 0xa8304613, 0xfd469501,
 			0x698098d8, 0x8b44f7af, 0xffff5bb1, 0x895cd7be,
@@ -40,15 +40,15 @@ size_t	md5_get_rotation_amount(size_t i)
 {
 	static size_t	s_rotations[4][4] = {
 			{ 7, 12, 17, 22 },
-			{ 5,  9, 14, 20 },
+			{ 5, 9, 14, 20 },
 			{ 4, 11, 16, 23 },
 			{ 6, 10, 15, 21 }
 	};
 
-	return s_rotations[i / 16][i % 4];
+	return (s_rotations[i / 16][i % 4]);
 }
 
-void	md5_initialize_hash(t_md5_hash* hash)
+void	md5_initialize_hash(t_md5_hash *hash)
 {
 	hash->h0 = 0x67452301;
 	hash->h1 = 0xefcdab89;

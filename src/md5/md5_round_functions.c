@@ -12,32 +12,32 @@
 
 #include "md5.h"
 
-word	md5_round_function_f(word b, word c, word d)
+t_word					md5_round_function_f(t_word b, t_word c, t_word d)
 {
 	return ((b & c) | ((~b) & d));
 }
 
-word	md5_round_function_g(word b, word c, word d)
+t_word					md5_round_function_g(t_word b, t_word c, t_word d)
 {
 	return ((b & d) | ((~d) & c));
 }
 
-word	md5_round_function_h(word b, word c, word d)
+t_word					md5_round_function_h(t_word b, t_word c, t_word d)
 {
 	return (b ^ c ^ d);
 }
 
-word	md5_round_function_i(word b, word c, word d)
+t_word					md5_round_function_i(t_word b, t_word c, t_word d)
 {
 	return (c ^ (b | (~d)));
 }
 
-t_md5_round_function* md5_get_round_functions(void)
+t_md5_round_function	*md5_get_round_functions(void)
 {
 	static t_md5_round_function functions[] = {
 			md5_round_function_f, md5_round_function_g,
 			md5_round_function_h, md5_round_function_i
 	};
 
-	return functions;
+	return (functions);
 }

@@ -11,13 +11,13 @@
 /* ************************************************************************** */
 
 #ifndef FT_SSL_DATA_TYPES_H
-#define FT_SSL_DATA_TYPES_H
+# define FT_SSL_DATA_TYPES_H
 
 /*
 **	include stdlib for size_t
 */
-#include "stdlib.h"
+# include "stdlib.h"
 
-typedef unsigned int word;
+typedef unsigned int	t_word;
 
 #endif

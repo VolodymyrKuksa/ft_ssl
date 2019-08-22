@@ -15,58 +15,45 @@
 
 #include "libft.h"
 
-void		word_to_bytes(word w, unsigned char* bytes)
+unsigned char	*md5_hash_to_bytes(t_md5_hash hash)
 {
-	bytes[3] = (w >> 24) & 0xff;
-	bytes[2] = (w >> 16) & 0xff;
-	bytes[1] = (w >> 8) & 0xff;
-	bytes[0] = w & 0xff;
-}
-
-unsigned char*	md5_hash_to_bytes(t_md5_hash hash)
-{
-	unsigned char*	result;
+	unsigned char	*result;
 
 	if (!(result = (unsigned char*)malloc(sizeof(t_md5_hash))))
-		return NULL;
-
+		return (NULL);
 	word_to_bytes(hash.h0, result);
 	word_to_bytes(hash.h1, result + 4);
 	word_to_bytes(hash.h2, result + 8);
 	word_to_bytes(hash.h3, result + 12);
-
-	return result;
+	return (result);
 }
 
-t_md5_hash	process_chunk(const word* chunk, t_md5_hash hash)
+t_md5_hash		process_chunk(const t_word *chunk, t_md5_hash hash)
 {
 	size_t	i;
 	size_t	g;
-	word	f;
+	t_word	f;
 
 	i = 0;
-	while(i < 64)
+	while (i < 64)
 	{
 		f = md5_get_round_functions()[i / 16]
 			(hash.h1, hash.h2, hash.h3);
 		g = md5_get_g_functions()[i / 16](i);
-
 		f = f + hash.h0 + md5_get_constants()[i] + chunk[g];
 		hash.h0 = hash.h3;
 		hash.h3 = hash.h2;
 		hash.h2 = hash.h1;
 		hash.h1 += LEFTROTATE(f, md5_get_rotation_amount(i));
-
 		++i;
 	}
-
 	return (hash);
 }
 
-unsigned char*	md5(unsigned char* msg, size_t len)
+unsigned char	*md5(unsigned char *msg, size_t len)
 {
 	int			i;
-	word		chunk[MD5_BLOCK_SIZE / sizeof(word)];
+	t_word		chunk[MD5_BLOCK_SIZE / sizeof(t_word)];
 	t_md5_hash	hash;
 	t_md5_hash	chunk_hash;
 
@@ -76,13 +63,11 @@ unsigned char*	md5(unsigned char* msg, size_t len)
 	{
 		get_chunk(msg, chunk, i, MD5_BLOCK_SIZE);
 		chunk_hash = process_chunk(chunk, hash);
-
 		hash.h0 += chunk_hash.h0;
 		hash.h1 += chunk_hash.h1;
 		hash.h2 += chunk_hash.h2;
 		hash.h3 += chunk_hash.h3;
 		++i;
 	}
-
-	return md5_hash_to_bytes(hash);
+	return (md5_hash_to_bytes(hash));
 }

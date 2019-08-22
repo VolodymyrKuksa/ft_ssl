@@ -12,9 +12,9 @@
 
 #include "sha256.h"
 
-word*		sha256_get_constants()
+t_word		*sha256_get_constants(void)
 {
-	static word s_constants[] = {
+	static t_word s_constants[] = {
 			0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5,
 			0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
 			0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3,
@@ -33,10 +33,10 @@ word*		sha256_get_constants()
 			0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
 	};
 
-	return s_constants;
+	return (s_constants);
 }
 
-void		sha256_initialize_hash(t_sha256_hash* hash)
+void		sha256_initialize_hash(t_sha256_hash *hash)
 {
 	hash->h0 = 0x6a09e667;
 	hash->h1 = 0xbb67ae85;
