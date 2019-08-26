@@ -29,3 +29,13 @@ void	get_chunk(unsigned char *padded_message, t_word *chunk,
 	i = chunk_size_bytes * index;
 	ft_memcpy(chunk, padded_message + i, chunk_size_bytes);
 }
+
+t_word	leftrotate(t_word w, const size_t amount)
+{
+	return ((w << amount) | (w >> (32 - amount)));
+}
+
+t_word	rightrotate(t_word w, const size_t amount)
+{
+	return ((w >> amount) | (w << (32 - amount)));
+}

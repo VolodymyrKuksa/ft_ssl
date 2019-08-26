@@ -15,10 +15,6 @@
 
 # include "data_types.h"
 
-//	TODO: Remove this shit
-# define LEFTROTATE(x, c)	(((x) << (c)) | ((x) >> (32 - (c))))
-# define RIGHTROTATE(x, c)	(((x) >> (c)) | ((x) << (32 - (c))))
-
 /*
 **	padding.c
 */
@@ -31,5 +27,7 @@ unsigned char	*add_message_padding(unsigned char *message,
 void			word_to_bytes(t_word w, unsigned char *bytes);
 void			get_chunk(unsigned char *padded_message, t_word *chunk,
 			size_t index, size_t chunk_size_bytes);
+t_word			leftrotate(t_word w, size_t amount);
+t_word			rightrotate(t_word w, size_t amount);
 
 #endif
