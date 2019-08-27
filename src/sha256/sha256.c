@@ -10,6 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "stdio.h"//
+
 #include <libft.h>
 #include "ft_ssl.h"
 #include "sha256.h"
@@ -40,14 +42,25 @@ void				sha256_extend_message(t_word *message)
 	i = 16;
 	while (i < 64)
 	{
-		s0 = rightrotate(message[i - 15], 7) ^ rightrotate(message[i -15], 18) ^
-				(message[i - 15] >> 3);
-		s1 = rightrotate(message[i - 2], 17) ^ rightrotate(message[i - 2], 19) ^
-				(message[i - 2] >> 10);
+//		s0 := (w[i-15] rightrotate  7) xor (w[i-15] rightrotate 18) xor (w[i-15] rightshift  3)
+		s0 = rightrotate(message[i - 15], 7) ^ rightrotate(message[i - 15], 18) ^ (message[i - 15] >> 3);
+//		s1 := (w[i- 2] rightrotate 17) xor (w[i- 2] rightrotate 19) xor (w[i- 2] rightshift 10)
+		s1 = rightrotate(message[i - 2], 17) ^ rightrotate(message[i - 2], 19) ^ (message[i - 2] >> 10);
+//		w[i] := w[i-16] + s0 + w[i-7] + s1
 		message[i] = message[i - 16] + s0 + message[i - 7] + s1;
+
 		++i;
 	}
 }
+
+//		a := h0
+//		b := h1
+//		c := h2
+//		d := h3
+//		e := h4
+//		f := h5
+//		g := h6
+//		h := h7
 
 t_sha256_hash		sha256_process_chunk(
 						const t_word *chunk, t_sha256_hash hash)
@@ -55,15 +68,49 @@ t_sha256_hash		sha256_process_chunk(
 	int		i;
 	t_word	message[SHA256_WORDS_IN_MESSAGE_SCHEDULE];
 
-	ft_memcpy(message, chunk, SHA256_WORDS_IN_BLOCK);
+	for (int j = 0; j < SHA256_WORDS_IN_MESSAGE_SCHEDULE; ++j)
+	{
+		message[j] = 0;
+	}
+
+	ft_memcpy(message, chunk, SHA256_BLOCK_SIZE);
 	sha256_extend_message(message);
 	i = 0;
 	while (i < 64)
 	{
-		//	TODO: Main logic here
+//		S1 := (h4 rightrotate 6) xor (h4 rightrotate 11) xor (h4 rightrotate 25)
+		t_word S1 = rightrotate(hash.h4, 6) ^ rightrotate(hash.h4, 11) ^ rightrotate(hash.h4, 25);
+//		ch := (h4 and h5) xor ((not h4) and h6)
+		t_word ch = (hash.h4 & hash.h5) ^ ((~hash.h4) & hash.h6);
+//		temp1 := h7 + S1 + ch + k[i] + w[i]
+		t_word temp1 = hash.h7 + S1 + ch + sha256_get_constants()[i] + message[i];
+//		S0 := (h0 rightrotate 2) xor (h0 rightrotate 13) xor (h0 rightrotate 22)
+		t_word S0 = rightrotate(hash.h0, 2) ^ rightrotate(hash.h0, 13) ^ rightrotate(hash.h0, 22);
+//		maj := (h0 and h1) xor (h0 and h2) xor (h1 and h2)
+		t_word maj = (hash.h0 & hash.h1) ^ (hash.h0 & hash.h2) ^ (hash.h1 & hash.h2);
+//		temp2 := S0 + maj
+		t_word temp2 = S0 + maj;
+
+//		h7 := h6
+		hash.h7 = hash.h6;
+//		h6 := h5
+		hash.h6 = hash.h5;
+//		h5 := h4
+		hash.h5 = hash.h4;
+//		h4 := h3 + temp1
+		hash.h4 = hash.h3 + temp1;
+//		h3 := h2
+		hash.h3 = hash.h2;
+//		h2 := h1
+		hash.h2 = hash.h1;
+//		h1 := h0
+		hash.h1 = hash.h0;
+//		h0 := temp1 + temp2
+		hash.h0 = temp1 + temp2;
+
 		++i;
 	}
-	return hash;
+	return (hash);
 }
 
 unsigned char		*sha256(unsigned char *msg, size_t len)

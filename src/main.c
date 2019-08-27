@@ -10,11 +10,12 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "stdio.h"
+#include "stdio.h"//
 
 #include "ft_ssl.h"
 #include "stdlib.h"
 #include "md5.h"
+#include "sha256.h"
 
 #include "libft.h"
 
@@ -26,12 +27,12 @@ int	main(void)
 	unsigned char	*padded_message;
 	unsigned char	*bytes;
 
-	msg = (unsigned char*)"The quick brown fox jumps over the lazy dog";
+	msg = (unsigned char*)"";
 	len = ft_strlen((char*)msg);
 	padded_message = add_message_padding(msg, len,
-			&padded_length, MD5_BLOCK_SIZE);
-	bytes = md5(padded_message, padded_length);
-	for (int i = 0; i < 16; ++i)
+			&padded_length, SHA256_BLOCK_SIZE);
+	bytes = sha256(padded_message, padded_length);
+	for (int i = 0; i < 32; ++i)
 	{
 		printf("%2.2x", bytes[i]);
 	}
