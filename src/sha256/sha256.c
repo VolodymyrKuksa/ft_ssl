@@ -115,7 +115,7 @@ t_sha256_hash		sha256_process_chunk(
 
 unsigned char		*sha256(unsigned char *msg, size_t len)
 {
-	int				i;
+	size_t			i;
 	t_word			chunk[SHA256_WORDS_IN_BLOCK];
 	t_sha256_hash	hash;
 	t_sha256_hash	chunk_hash;

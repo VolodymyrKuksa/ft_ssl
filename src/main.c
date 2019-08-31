@@ -19,7 +19,7 @@
 
 #include "libft.h"
 
-int	main(void)
+int		main(void)
 {
 	unsigned char	*msg;
 	size_t			len;
@@ -27,12 +27,15 @@ int	main(void)
 	unsigned char	*padded_message;
 	unsigned char	*bytes;
 
-	msg = (unsigned char*)"";
+	int endianness = is_little_endian();
+	printf("is little endian: %d\n", endianness);
+
+	msg = (unsigned char*)ft_strdup("Quick Brown Fox Jumps Over The Lazy Dog");
 	len = ft_strlen((char*)msg);
 	padded_message = add_message_padding(msg, len,
-			&padded_length, SHA256_BLOCK_SIZE);
-	bytes = sha256(padded_message, padded_length);
-	for (int i = 0; i < 32; ++i)
+			&padded_length, MD5_BLOCK_SIZE);
+	bytes = md5(padded_message, padded_length);
+	for (int i = 0; i < 16; ++i)
 	{
 		printf("%2.2x", bytes[i]);
 	}

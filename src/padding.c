@@ -25,7 +25,7 @@ void			length_to_bytes(unsigned long length, unsigned char *bytes)
 	bytes[0] = length & 0xff;
 }
 
-unsigned char	*add_message_padding(unsigned char *message,
+unsigned char	*add_message_padding(unsigned char const *const message,
 			size_t initial_length, size_t *padded_length, size_t block_size)
 {
 	unsigned char	length_bytes[sizeof(unsigned long)];

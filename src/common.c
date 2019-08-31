@@ -21,7 +21,7 @@ void	word_to_bytes(t_word w, unsigned char *bytes)
 	bytes[0] = w & 0xff;
 }
 
-void	get_chunk(unsigned char *padded_message, t_word *chunk,
+void	get_chunk(unsigned char const *const padded_message, t_word *chunk,
 			size_t index, size_t chunk_size_bytes)
 {
 	size_t i;

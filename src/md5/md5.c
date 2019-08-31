@@ -50,9 +50,9 @@ t_md5_hash		md5_process_chunk(const t_word *chunk, t_md5_hash hash)
 	return (hash);
 }
 
-unsigned char	*md5(unsigned char *msg, size_t len)
+unsigned char	*md5_main_logic(unsigned char const *const msg, size_t len)
 {
-	int			i;
+	size_t		i;
 	t_word		chunk[MD5_WORDS_IN_BLOCK];
 	t_md5_hash	hash;
 	t_md5_hash	chunk_hash;
@@ -70,4 +70,19 @@ unsigned char	*md5(unsigned char *msg, size_t len)
 		++i;
 	}
 	return (md5_hash_to_bytes(hash));
+}
+
+unsigned char	*md5(unsigned char const *const msg, size_t len)
+{
+	unsigned char	*message;
+	unsigned char	*result;
+
+	if (!(message = ft_memalloc(len)))
+		return (NULL);
+	ft_memcpy(message, msg, len);
+	if (!is_little_endian())
+		reverse_endianness(message, len);
+	result = md5_main_logic(message, len);
+	free(message);
+	return (result);
 }

@@ -52,6 +52,6 @@ void					md5_initialize_hash(t_md5_hash *hash);
 /*
 **	md5.c
 */
-unsigned char			*md5(unsigned char *msg, size_t len);
+unsigned char			*md5(unsigned char const *msg, size_t len);
 
 #endif
