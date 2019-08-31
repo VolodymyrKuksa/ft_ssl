@@ -75,14 +75,18 @@ unsigned char	*md5_main_logic(unsigned char const *const msg, size_t len)
 unsigned char	*md5(unsigned char const *const msg, size_t len)
 {
 	unsigned char	*message;
+	unsigned char	*padded_message;
+	size_t			padded_length;
 	unsigned char	*result;
 
 	if (!(message = ft_memalloc(len)))
 		return (NULL);
 	ft_memcpy(message, msg, len);
+	padded_message = add_message_padding_little_endian(message, len,
+			&padded_length, MD5_BLOCK_SIZE);
 	if (!is_little_endian())
-		reverse_endianness(message, len);
-	result = md5_main_logic(message, len);
+		reverse_endianness(padded_message, len + sizeof(t_word));
+	result = md5_main_logic(padded_message, padded_length);
 	free(message);
 	return (result);
 }

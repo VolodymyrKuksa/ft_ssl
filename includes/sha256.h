@@ -41,6 +41,6 @@ void					sha256_initialize_hash(t_sha256_hash *hash);
 /*
 **	sha256.c
 */
-unsigned char			*sha256(unsigned char *msg, size_t len);
+unsigned char			*sha256(unsigned char const *msg, size_t len);
 
 #endif

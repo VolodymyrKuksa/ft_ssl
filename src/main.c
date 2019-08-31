@@ -23,22 +23,23 @@ int		main(void)
 {
 	unsigned char	*msg;
 	size_t			len;
-	size_t			padded_length;
-	unsigned char	*padded_message;
 	unsigned char	*bytes;
-
-	int endianness = is_little_endian();
-	printf("is little endian: %d\n", endianness);
 
 	msg = (unsigned char*)ft_strdup("Quick Brown Fox Jumps Over The Lazy Dog");
 	len = ft_strlen((char*)msg);
-	padded_message = add_message_padding(msg, len,
-			&padded_length, MD5_BLOCK_SIZE);
-	bytes = md5(padded_message, padded_length);
+	bytes = md5(msg, len);
 	for (int i = 0; i < 16; ++i)
 	{
 		printf("%2.2x", bytes[i]);
 	}
+	free(bytes);
+	printf("\n");
+	bytes = sha256(msg, len);
+	for (int i = 0; i < 32; ++i)
+	{
+		printf("%2.2x", bytes[i]);
+	}
+	free(bytes);
 	printf("\n");
 	return (0);
 }

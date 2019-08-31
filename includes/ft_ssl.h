@@ -18,8 +18,10 @@
 /*
 **	padding.c
 */
-unsigned char	*add_message_padding(unsigned char const *const message,
+unsigned char	*add_message_padding_big_endian(unsigned char const *message,
 			size_t initial_length, size_t *padded_length, size_t block_size);
+unsigned char	*add_message_padding_little_endian(unsigned char const *message,
+		size_t initial_length, size_t *padded_length, size_t block_size);
 
 /*
 **	common.c
