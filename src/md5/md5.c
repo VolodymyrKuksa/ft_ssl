@@ -79,7 +79,7 @@ unsigned char	*md5(unsigned char const *const msg, size_t len)
 	size_t			padded_length;
 	unsigned char	*result;
 
-	if (!(message = ft_memalloc(len)))
+	if (!(message = (unsigned char*)malloc(len)))
 		return (NULL);
 	ft_memcpy(message, msg, len);
 	padded_message = add_message_padding_little_endian(message, len,

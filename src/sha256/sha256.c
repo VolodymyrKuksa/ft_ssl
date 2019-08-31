@@ -116,7 +116,7 @@ unsigned char		*sha256(unsigned char const *const msg, size_t len)
 	int				endianness;
 
 	endianness = is_little_endian();
-	if (!(message = ft_memalloc(len)))
+	if (!(message = (unsigned char*)malloc(len)))
 		return (NULL);
 	ft_memcpy(message, msg, len);
 	padded_message = add_message_padding_big_endian(message, len,
