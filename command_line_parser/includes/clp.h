@@ -15,17 +15,18 @@
 
 typedef enum	e_clp_result
 {
-	clp_success,
-	clp_unexpected_null_ptr,
-	clp_memory_allocation_failure,
-	clp_unknown_command_name,
-	clp_failure
+	clp_success = 1 << 0,
+	clp_unexpected_null_ptr = 1 << 1,
+	clp_memory_allocation_failure = 1 << 2,
+	clp_unknown_command_name = 1 << 3,
+	clp_failure = 1 << 4
 }				t_clp_result;
 
-typedef void (t_clp_cmd_func)(int flags, int param_count, char **params);
+typedef t_clp_result	(t_clp_cmd_func)
+						(int flags, int param_count, char **params);
 
 t_clp_result	clp_add_command(const char *name, const char *description,
-					t_clp_cmd_func *func);
+					const char *arg_description, t_clp_cmd_func *func);
 
 /*
 **	if command_name == NULL, the flag is applied to all commands
@@ -37,6 +38,6 @@ t_clp_result	clp_add_flag(const char *name, const char *description,
 t_clp_result	clp_parse(int argc, char **argv);
 void			clp_clear();
 
-const char		*clp_get_result_string(t_clp_result);
+char			*clp_get_result_string(t_clp_result);
 
 # endif

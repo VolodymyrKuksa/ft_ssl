@@ -25,6 +25,11 @@ void	clp_clear_parameter(t_clp_param *param)
 		free((void*)param->description);
 		param->description = NULL;
 	}
+	if (param->argument_description)
+	{
+		free((void *) param->argument_description);
+		param->argument_description = NULL;
+	}
 }
 
 void	clp_clear_command(t_clp_cmd *cmd)

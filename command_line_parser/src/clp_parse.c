@@ -58,8 +58,31 @@ t_clp_flag		*clp_get_flag(const char* name)
 	return (NULL);
 }
 
+t_clp_result	clp_parse_internal(int argc, char **argv)
+{
+	t_clp_cmd	*cmd;
+	t_clp_flag	*flag;
+	int			flags;
+	int			i;
+
+	if (argc == 1 || !(cmd = clp_get_cmd(argv[1])))
+		return (clp_unknown_command_name);
+	flags = 0;
+	i = 2;
+	while (i < argc)
+	{
+		if (!(flag = clp_get_cmd_flag(argv[i], cmd)) &&
+		!(flag = clp_get_flag(argv[i])))
+			break;
+		flags |= flag->value;
+		++i;
+	}
+	return (cmd->function(flags, argc - i, argv + i));
+}
+
 t_clp_result	clp_parse(int argc, char **argv)
 {
-	clp_print_usage(argv[0]);
-	return clp_success;
+	if (clp_parse_internal(argc, argv) != clp_success)
+		return (clp_print_usage(argv[0]));
+	return (clp_success);
 }

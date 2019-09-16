@@ -13,10 +13,13 @@
 #ifndef CLP_DATA_TYPES_H
 # define CLP_DATA_TYPES_H
 
+#include "clp.h"
+
 typedef struct	s_clp_parameter
 {
 	const char	*name;
 	const char	*description;
+	const char	*argument_description;
 }				t_clp_param;
 
 typedef struct	s_clp_flag
@@ -25,7 +28,8 @@ typedef struct	s_clp_flag
 	int				value;
 }				t_clp_flag;
 
-typedef void (t_clp_cmd_func)(int flags, int param_count, char **params);
+typedef t_clp_result	(t_clp_cmd_func)
+						(int flags, int param_count, char **params);
 
 typedef struct	s_clp_command
 {

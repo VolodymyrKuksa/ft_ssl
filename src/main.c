@@ -20,45 +20,58 @@
 #include "libft.h"
 #include "clp.h"
 
-void	md5_func(int flags, int argc, char** argv)
+t_clp_result	md5_func(int flags, int argc, char** argv)
 {
 	printf("md5_func{flags: %d, argc: %d, argv: ", flags, argc);
 	for (int i = 0; i < argc; ++i)
 		printf(argc - i == 1 ? "%s": "%s, ", argv[i]);
 	printf("}\n");
+	return clp_success;
 }
 
-void	sha256_func(int flags, int argc, char** argv)
+t_clp_result	sha256_func(int flags, int argc, char** argv)
 {
 	printf("sha256_func{flags: %d, argc: %d, argv: ", flags, argc);
 	for (int i = 0; i < argc; ++i)
 		printf(argc - i == 1 ? "%s": "%s, ", argv[i]);
 	printf("}\n");
+	if (flags == 1)
+		return clp_failure;
+	return clp_success;
 }
 
-void	check_clp_result(t_clp_result result)
+void	process_clp_result(t_clp_result result)
 {
-	if (result != clp_success)
+	char	*clp_error_str;
+
+	clp_error_str = clp_get_result_string(result);
+	if (!clp_error_str)
 	{
-		printf("CLP Error: %s\n", clp_get_result_string(result));
-		exit(1);
+		ft_putendl("Failed to parse CLP error(s)");
+		return;
 	}
+	ft_putendl("CLP Error(s):");
+	ft_putstr(clp_error_str);
+	free(clp_error_str);
 }
 
 int		main(int argc, char **argv)
 {
-	t_clp_result	result;
+	t_clp_result	r;
+	const char		*arg_desc = "Param1 - param1 desc\n"
+								"Param2 - param2 desc\n"
+								"Param3 - param3 desc\n"
+								"Param4 - param4 desc";
 
-	result = clp_add_command("md5", "Execute MD5 hashing algorithm", md5_func);
-	check_clp_result(result);
-	result = clp_add_command("sha256", "Execute SHA256 hashing algorithm", sha256_func);
-	check_clp_result(result);
-	result = clp_add_flag("-q", "Quiet mode", NULL, 1);
-	check_clp_result(result);
-	result = clp_add_flag("-q", "Quiet mode for md5", "md5", 2);
-	check_clp_result(result);
-	result = clp_parse(argc, argv);
-	check_clp_result(result);
+	r = 0;
+	r |= clp_add_command("md5", "Execute MD5 hashing algorithm", arg_desc, md5_func);
+	r |= clp_add_command("sha256", "Execute SHA256 hashing algorithm", arg_desc, sha256_func);
+	r |= clp_add_flag("-q", "Quiet mode", NULL, 1);
+	r |= clp_parse(argc, argv);
+	if (r != clp_success) {
+		process_clp_result(r);
+		return (1);
+	}
 	clp_clear();
 	return (0);
 
