@@ -58,15 +58,18 @@ void	process_clp_result(t_clp_result result)
 int		main(int argc, char **argv)
 {
 	t_clp_result	r;
-	const char		*arg_desc = "Param1 - param1 desc\n"
-								"Param2 - param2 desc\n"
-								"Param3 - param3 desc\n"
-								"Param4 - param4 desc";
+//	const char		*arg_desc = "Param1 - param1 desc\n"
+//								"Param2 - param2 desc\n"
+//								"Param3 - param3 desc\n"
+//								"Param4 - param4 desc";
 
 	r = 0;
-	r |= clp_add_command("md5", "Execute MD5 hashing algorithm", arg_desc, md5_func);
-	r |= clp_add_command("sha256", "Execute SHA256 hashing algorithm", arg_desc, sha256_func);
-	r |= clp_add_flag("-q", "Quiet mode", NULL, 1);
+	r |= clp_add_command("md5", "Execute MD5 hashing algorithm", NULL, md5_func);
+	r |= clp_add_command("sha256", "Execute SHA256 hashing algorithm", NULL, sha256_func);
+	r |= clp_add_flag("-p", "echo STDIN to STDOUT and append the checksum to STDOUT", NULL, flag_print);
+	r |= clp_add_flag("-q", "quiet mode", NULL, flag_quiet);
+	r |= clp_add_flag("-r", "reverse the format of the output", NULL, flag_reverse);
+	r |= clp_add_flag("-s", "print the sum of the given string", NULL, flag_string);
 	r |= clp_parse(argc, argv);
 	if (r != clp_success) {
 		process_clp_result(r);

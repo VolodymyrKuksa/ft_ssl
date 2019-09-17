@@ -15,6 +15,13 @@
 
 # include "data_types.h"
 
+typedef enum	e_command_line_flags {
+	flag_print = 1 << 0,
+	flag_quiet = 1 << 1,
+	flag_reverse = 1 << 2,
+	flag_string = 1 << 3
+}				t_cmd_flags;
+
 /*
 **	padding.c
 */
