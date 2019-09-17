@@ -10,8 +10,10 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-# include <stdlib.h>
-# include "clp_internal.h"
+#include <stdlib.h>
+#include "clp_internal.h"
+
+extern t_clp_app	*g_app;
 
 void	clp_clear_parameter(t_clp_param *param)
 {
@@ -27,7 +29,7 @@ void	clp_clear_parameter(t_clp_param *param)
 	}
 	if (param->argument_description)
 	{
-		free((void *) param->argument_description);
+		free((void *)param->argument_description);
 		param->argument_description = NULL;
 	}
 }
@@ -66,4 +68,14 @@ void	clp_clear_app(t_clp_app *app)
 	free(app->common_flags);
 	app->common_flags = NULL;
 	app->common_flag_count = 0;
+}
+
+void	clp_clear(void)
+{
+	if (g_app)
+	{
+		clp_clear_app(g_app);
+		free(g_app);
+		g_app = NULL;
+	}
 }

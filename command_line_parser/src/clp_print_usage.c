@@ -10,14 +10,14 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-# include "libft.h"
-# include "clp_data_types.h"
-# include "clp_internal.h"
+#include "libft.h"
+#include "clp_data_types.h"
+#include "clp_internal.h"
 
-extern t_clp_app	*app;
+extern t_clp_app	*g_app;
 
-void	clp_print_arg_description(const char *description,
-		const char * indent)
+void			clp_print_arg_description(const char *description,
+		const char *indent)
 {
 	char	*new_line;
 
@@ -53,7 +53,6 @@ t_clp_result	clp_print_param(t_clp_param *param, const char *indent)
 		clp_print_arg_description(param->argument_description, arg_indent);
 		free(arg_indent);
 	}
-
 	return (clp_success);
 }
 
@@ -63,19 +62,19 @@ t_clp_result	clp_print_command_usage(t_clp_cmd *cmd)
 	t_clp_result	r;
 
 	r = clp_print_param(&cmd->param, "\t");
-	if (cmd->flag_count || app->common_flag_count)
+	if (cmd->flag_count || g_app->common_flag_count)
 		ft_putendl("\tFlags:");
 	i = 0;
 	while (i < cmd->flag_count)
 		r |= clp_print_param(&cmd->flags[i++].param, "\t\t");
 	i = 0;
-	while (i < app->common_flag_count) {
-		if (!clp_get_cmd_flag(app->common_flags[i].param.name, cmd))
-			r |= clp_print_param(&app->common_flags[i].param, "\t\t");
+	while (i < g_app->common_flag_count)
+	{
+		if (!clp_get_cmd_flag(g_app->common_flags[i].param.name, cmd))
+			r |= clp_print_param(&g_app->common_flags[i].param, "\t\t");
 		i++;
 	}
-
-	return r;
+	return (r);
 }
 
 t_clp_result	clp_print_usage(const char *app_name)
@@ -89,11 +88,10 @@ t_clp_result	clp_print_usage(const char *app_name)
 	ft_putendl("Commands:\n");
 	r = clp_success;
 	i = 0;
-	while (i < app->command_count)
+	while (i < g_app->command_count)
 	{
-		r |= clp_print_command_usage(&app->commands[i++]);
+		r |= clp_print_command_usage(&g_app->commands[i++]);
 		ft_putchar('\n');
 	}
-
 	return (r);
 }

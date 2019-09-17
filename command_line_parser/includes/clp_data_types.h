@@ -13,7 +13,7 @@
 #ifndef CLP_DATA_TYPES_H
 # define CLP_DATA_TYPES_H
 
-#include "clp.h"
+# include "clp.h"
 
 typedef struct	s_clp_parameter
 {
@@ -47,4 +47,4 @@ typedef struct	s_clp_app
 	int			common_flag_count;
 }				t_clp_app;
 
-# endif
+#endif

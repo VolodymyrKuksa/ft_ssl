@@ -38,6 +38,6 @@ t_clp_result	clp_add_flag(const char *name, const char *description,
 t_clp_result	clp_parse(int argc, char **argv);
 void			clp_clear();
 
-char			*clp_get_result_string(t_clp_result);
+char			*clp_get_result_string(t_clp_result result);
 
-# endif
+#endif
