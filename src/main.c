@@ -92,20 +92,26 @@ char			*to_hex(unsigned char *bytes, size_t size)
 	return (result);
 }
 
-//	TODO: create some func that take pointer to the algo func as a param
-//		and executes the code below (md5/sha256_func are the same)
+void			execute_hash_function(unsigned char* input, size_t input_size,
+		unsigned char* (*f)(const unsigned char*, size_t), size_t hash_size)
+{
+	unsigned char	*hash;
+	char			*output;
+
+	hash = f(input, input_size);
+	output = to_hex(hash, hash_size);
+	ft_putendl(output);
+	free(output);
+	free(hash);
+}
+
 t_clp_result	md5_func(int flags, int argc, char** argv)
 {
 	char			*input;
 	size_t			input_size;
-	unsigned char	*hash;
-	char			*output;
 
 	read_stdin(&input, &input_size);
-	hash = md5((unsigned char*)input, input_size);
-	output = to_hex(hash, 16);
-	ft_putendl(output);
-	free(output);
+	execute_hash_function((unsigned char*)input, input_size, md5, 16);
 	free(input);
 	return clp_success;
 }
@@ -114,14 +120,9 @@ t_clp_result	sha256_func(int flags, int argc, char** argv)
 {
 	char			*input;
 	size_t			input_size;
-	unsigned char	*hash;
-	char			*output;
 
 	read_stdin(&input, &input_size);
-	hash = sha256((unsigned char*)input, input_size);
-	output = to_hex(hash, 32);
-	ft_putendl(output);
-	free(output);
+	execute_hash_function((unsigned char*)input, input_size, sha256, 32);
 	free(input);
 	return clp_success;
 }
