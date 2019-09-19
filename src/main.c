@@ -20,23 +20,109 @@
 #include "libft.h"
 #include "clp.h"
 
+void			append_bytes(char **dst, size_t const dst_size,
+		char const *src, size_t const src_size)
+{
+	char	*result_bytes;
+
+	if (!src_size)
+		return ;
+	if (!(result_bytes = (char*)malloc(dst_size + src_size)))
+	{
+		*dst = NULL;
+		return ;
+	}
+	ft_memcpy(result_bytes, dst, dst_size);
+	ft_memcpy(result_bytes + dst_size, src, src_size);
+	free(*dst);
+	*dst = result_bytes;
+}
+
+void			read_stdin(char** bytes, size_t* bytes_size)
+{
+	char	*input_buff;
+	size_t	n;
+
+	if (!(input_buff = (char*)malloc(INPUT_BUFFER_SIZE)))
+	{
+		ft_putendl("Failed to allocate input buffer");
+		exit(1);
+	}
+
+	*bytes_size = 0;
+	*bytes = (char*)malloc(*bytes_size);
+	n = 1;
+	while (n > 0)
+	{
+		n = read(0, input_buff, INPUT_BUFFER_SIZE);
+		append_bytes(bytes, *bytes_size, input_buff, n);
+		if (!*bytes)
+		{
+			ft_putendl("Memory allocation fail when reading input");
+			exit(1);
+		}
+		*bytes_size += n;
+	}
+
+	free(input_buff);
+}
+
+char			*to_hex(unsigned char *bytes, size_t size)
+{
+	char	*hex_byte;
+	char	*result;
+	size_t	i;
+
+	result = ft_strnew(size * 2);
+	i = 0;
+	while (i < size)
+	{
+		hex_byte = ft_itoa_base((int)(bytes[i]), 16);
+		if (ft_strlen(hex_byte) != 2)
+		{
+			result[2 * i] = '0';
+			result[(2 * i) + 1] = hex_byte[0];
+		}
+		else
+			ft_strcpy(result + 2 * i, hex_byte);
+		free(hex_byte);
+		++i;
+	}
+
+	return (result);
+}
+
+//	TODO: create some func that take pointer to the algo func as a param
+//		and executes the code below (md5/sha256_func are the same)
 t_clp_result	md5_func(int flags, int argc, char** argv)
 {
-	printf("md5_func{flags: %d, argc: %d, argv: ", flags, argc);
-	for (int i = 0; i < argc; ++i)
-		printf(argc - i == 1 ? "%s": "%s, ", argv[i]);
-	printf("}\n");
+	char			*input;
+	size_t			input_size;
+	unsigned char	*hash;
+	char			*output;
+
+	read_stdin(&input, &input_size);
+	hash = md5((unsigned char*)input, input_size);
+	output = to_hex(hash, 16);
+	ft_putendl(output);
+	free(output);
+	free(input);
 	return clp_success;
 }
 
 t_clp_result	sha256_func(int flags, int argc, char** argv)
 {
-	printf("sha256_func{flags: %d, argc: %d, argv: ", flags, argc);
-	for (int i = 0; i < argc; ++i)
-		printf(argc - i == 1 ? "%s": "%s, ", argv[i]);
-	printf("}\n");
-	if (flags == 1)
-		return clp_failure;
+	char			*input;
+	size_t			input_size;
+	unsigned char	*hash;
+	char			*output;
+
+	read_stdin(&input, &input_size);
+	hash = sha256((unsigned char*)input, input_size);
+	output = to_hex(hash, 32);
+	ft_putendl(output);
+	free(output);
+	free(input);
 	return clp_success;
 }
 
@@ -58,10 +144,6 @@ void	process_clp_result(t_clp_result result)
 int		main(int argc, char **argv)
 {
 	t_clp_result	r;
-//	const char		*arg_desc = "Param1 - param1 desc\n"
-//								"Param2 - param2 desc\n"
-//								"Param3 - param3 desc\n"
-//								"Param4 - param4 desc";
 
 	r = 0;
 	r |= clp_add_command("md5", "Execute MD5 hashing algorithm", NULL, md5_func);
@@ -77,32 +159,4 @@ int		main(int argc, char **argv)
 	}
 	clp_clear();
 	return (0);
-
-
-
-
-
-
-
-//	unsigned char	*msg;
-//	size_t			len;
-//	unsigned char	*bytes;
-
-//	msg = (unsigned char*)ft_strdup("Quick Brown Fox Jumps Over The Lazy Dog");
-//	len = ft_strlen((char*)msg);
-//	bytes = md5(msg, len);
-//	for (int i = 0; i < 16; ++i)
-//	{
-//		printf("%2.2x", bytes[i]);
-//	}
-//	free(bytes);
-//	printf("\n");
-//	bytes = sha256(msg, len);
-//	for (int i = 0; i < 32; ++i)
-//	{
-//		printf("%2.2x", bytes[i]);
-//	}
-//	free(bytes);
-//	printf("\n");
-//	return (0);
 }

@@ -21,6 +21,8 @@ static int	ft_count_len(unsigned int nb, int base, int sign)
 	if (sign == -1)
 		len++;
 	n = nb;
+	if (!n)
+		len++;
 	while (n)
 	{
 		n /= base;
@@ -36,12 +38,14 @@ static char	*ft_convert(unsigned int nb, int base, int sign)
 	int		i;
 
 	i = ft_count_len(nb, base, sign);
-	str_base = ft_strdup("0123456789ABCDEF");
+	str_base = ft_strdup("0123456789abcdef");
 	res = ft_strnew((size_t)i);
 	if (!res)
 		return (NULL);
 	if (sign == -1)
 		res[0] = '-';
+	if (!nb)
+		res[--i] = '0';
 	while (nb)
 	{
 		res[--i] = str_base[nb % base];
@@ -55,7 +59,7 @@ char		*ft_itoa_base(int value, int base)
 	int				sign;
 	unsigned int	nb;
 
-	if (!value || !base)
+	if (!base)
 		return (NULL);
 	sign = 0;
 	(base == 10 && value < 0) ? sign-- : sign++;

@@ -22,6 +22,8 @@ typedef enum	e_command_line_flags {
 	flag_string = 1 << 3
 }				t_cmd_flags;
 
+# define INPUT_BUFFER_SIZE 2048
+
 /*
 **	padding.c
 */
