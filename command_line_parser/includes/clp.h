@@ -13,7 +13,7 @@
 #ifndef CLP_H
 # define CLP_H
 
-#include "clp_data_types.h"
+# include "clp_data_types.h"
 
 /*
 **	identifier has to be >= 0

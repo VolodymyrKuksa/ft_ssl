@@ -25,6 +25,9 @@ t_clp_result	clp_fill_new_param(t_clp_param *param,
 t_clp_result	clp_fill_param_description(t_clp_param *param,
 				const char *description, const char *arg_description);
 
+t_clp_result	clp_add_flag_to_array(t_clp_flag **array, int *size,
+				t_clp_param *param, t_clp_flag_func func);
+
 t_clp_result	clp_print_usage(const char *app_name);
 
 t_clp_cmd		*clp_get_cmd(const char *name);
