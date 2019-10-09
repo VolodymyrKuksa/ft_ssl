@@ -32,6 +32,7 @@ void	clp_clear_parameter(t_clp_param *param)
 		free((void *)param->argument_description);
 		param->argument_description = NULL;
 	}
+	param->identifier = -1;
 }
 
 void	clp_clear_command(t_clp_cmd *cmd)
@@ -49,7 +50,7 @@ void	clp_clear_command(t_clp_cmd *cmd)
 void	clp_clear_flag(t_clp_flag *flag)
 {
 	clp_clear_parameter(&flag->param);
-	flag->value = 0;
+	flag->function = NULL;
 }
 
 void	clp_clear_app(t_clp_app *app)

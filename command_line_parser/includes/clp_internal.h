@@ -20,15 +20,20 @@ void			clp_clear_app(t_clp_app *app);
 void			clp_clear_flag(t_clp_flag *flag);
 
 t_clp_app		*clp_new_app();
-t_clp_result	clp_fill_new_command(t_clp_cmd *cmd, const char *name,
-	const char *description, const char *arg_description);
-t_clp_result	clp_fill_new_flag(t_clp_flag *flag, const char *name,
-				const char *description, int value);
+t_clp_result	clp_fill_new_param(t_clp_param *param,
+				const char *name, int id);
+t_clp_result	clp_fill_param_description(t_clp_param *param,
+				const char *description, const char *arg_description);
 
 t_clp_result	clp_print_usage(const char *app_name);
 
 t_clp_cmd		*clp_get_cmd(const char *name);
+t_clp_cmd		*clp_get_cmd_by_id(int cmd_id);
+
 t_clp_flag		*clp_get_cmd_flag(const char *name, t_clp_cmd *cmd);
+t_clp_flag		*clp_get_cmd_flag_by_id(int flg_id, t_clp_cmd *cmd);
+
 t_clp_flag		*clp_get_flag(const char *name);
+t_clp_flag		*clp_get_flag_by_id(int flg_id);
 
 #endif

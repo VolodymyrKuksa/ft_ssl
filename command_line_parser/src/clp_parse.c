@@ -30,6 +30,20 @@ t_clp_cmd		*clp_get_cmd(const char *name)
 	return (NULL);
 }
 
+t_clp_cmd		*clp_get_cmd_by_id(int id)
+{
+	int i;
+
+	i = 0;
+	while (i < g_app->command_count)
+	{
+		if (id == g_app->commands[i].param.identifier)
+			return (&g_app->commands[i]);
+		i++;
+	}
+	return (NULL);
+}
+
 t_clp_flag		*clp_get_cmd_flag(const char *name, t_clp_cmd *cmd)
 {
 	int i;
@@ -38,6 +52,20 @@ t_clp_flag		*clp_get_cmd_flag(const char *name, t_clp_cmd *cmd)
 	while (i < cmd->flag_count)
 	{
 		if (!ft_strcmp(name, cmd->flags[i].param.name))
+			return (&cmd->flags[i]);
+		i++;
+	}
+	return (NULL);
+}
+
+t_clp_flag		*clp_get_cmd_flag_by_id(int flg_id, t_clp_cmd *cmd)
+{
+	int i;
+
+	i = 0;
+	while (i < cmd->flag_count)
+	{
+		if (flg_id == cmd->flags[i].param.identifier)
 			return (&cmd->flags[i]);
 		i++;
 	}
@@ -58,13 +86,31 @@ t_clp_flag		*clp_get_flag(const char *name)
 	return (NULL);
 }
 
+
+t_clp_flag		*clp_get_flag_by_id(int flg_id)
+{
+	int i;
+
+	i = 0;
+	while (i < g_app->common_flag_count)
+	{
+		if (flg_id == g_app->common_flags[i].param.identifier)
+			return (&g_app->common_flags[i]);
+		i++;
+	}
+	return (NULL);
+}
+
 t_clp_result	clp_parse_internal(int argc, char **argv)
 {
-	t_clp_cmd	*cmd;
-	t_clp_flag	*flag;
-	int			flags;
-	int			i;
+	t_clp_cmd			*cmd;
+	t_clp_flag			*flag;
+	t_clp_cmd_arguments	arg;
+	int					flags;
+	int					i;
 
+	arg.count = argc;
+	arg.vector = argv;
 	if (argc == 1 || !(cmd = clp_get_cmd(argv[1])))
 		return (clp_unknown_command_name);
 	flags = 0;
@@ -74,10 +120,11 @@ t_clp_result	clp_parse_internal(int argc, char **argv)
 		if (!(flag = clp_get_cmd_flag(argv[i], cmd)) &&
 		!(flag = clp_get_flag(argv[i])))
 			break ;
-		flags |= flag->value;
+		flag->function(cmd->param.identifier, flags, &arg, i);
+		flags |= flag->param.identifier;
 		++i;
 	}
-	return (cmd->function(flags, argc - i, argv + i));
+	return (cmd->function(flags, &arg));
 }
 
 t_clp_result	clp_parse(int argc, char **argv)

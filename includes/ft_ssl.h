@@ -22,6 +22,12 @@ typedef enum	e_command_line_flags {
 	flag_string = 1 << 3
 }				t_cmd_flags;
 
+typedef enum	e_command_identifiers {
+	cmd_none = -1,
+	cmd_md5,
+	cmd_sha256
+}				t_cmd_ids;
+
 # define INPUT_BUFFER_SIZE 2048
 
 /*

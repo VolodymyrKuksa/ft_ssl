@@ -105,7 +105,7 @@ void			execute_hash_function(unsigned char* input, size_t input_size,
 	free(hash);
 }
 
-t_clp_result	md5_func(int flags, int argc, char** argv)
+t_clp_result	md5_func(int flags, t_clp_cmd_arguments const *arg)
 {
 	char			*input;
 	size_t			input_size;
@@ -116,7 +116,7 @@ t_clp_result	md5_func(int flags, int argc, char** argv)
 	return clp_success;
 }
 
-t_clp_result	sha256_func(int flags, int argc, char** argv)
+t_clp_result	sha256_func(int flags, t_clp_cmd_arguments const *arg)
 {
 	char			*input;
 	size_t			input_size;
@@ -124,6 +124,22 @@ t_clp_result	sha256_func(int flags, int argc, char** argv)
 	read_stdin(&input, &input_size);
 	execute_hash_function((unsigned char*)input, input_size, sha256, 32);
 	free(input);
+	return clp_success;
+}
+
+t_clp_result	flg_func(int cmd_id, int prev_flags,
+				t_clp_cmd_arguments const *arg, int pos)
+{
+	printf("<%s>{prev_flags: [ ", arg->vector[pos]);
+	if (prev_flags & flag_print)
+		printf("-p ");
+	if (prev_flags & flag_quiet)
+		printf("-q ");
+	if (prev_flags & flag_reverse)
+		printf("-r ");
+	if (prev_flags & flag_string)
+		printf("-s ");
+	printf("] cmd: %d; pos: %d}\n", cmd_id, pos);
 	return clp_success;
 }
 
@@ -147,13 +163,19 @@ int		main(int argc, char **argv)
 	t_clp_result	r;
 
 	r = 0;
-	r |= clp_add_command("md5", "Execute MD5 hashing algorithm", NULL, md5_func);
-	r |= clp_add_command("sha256", "Execute SHA256 hashing algorithm", NULL, sha256_func);
-	r |= clp_add_flag("-p", "echo STDIN to STDOUT and append the checksum to STDOUT", NULL, flag_print);
-	r |= clp_add_flag("-q", "quiet mode", NULL, flag_quiet);
-	r |= clp_add_flag("-r", "reverse the format of the output", NULL, flag_reverse);
-	r |= clp_add_flag("-s", "print the sum of the given string", NULL, flag_string);
-	r |= clp_parse(argc, argv);
+	r |= clp_add_command("md5", cmd_md5, md5_func);
+	r |= clp_add_cmd_description(cmd_md5, "Execute MD5 hashing algorithm", NULL);
+	r |= clp_add_command("sha256", cmd_sha256, sha256_func);
+	r |= clp_add_cmd_description(cmd_sha256, "Execute SHA256 hashing algorithm", NULL);
+	r |= clp_add_flag("-p", cmd_none, flag_print, flg_func);
+	r |= clp_add_flg_description(cmd_none, flag_print, "echo STDIN to STDOUT and append the checksum to STDOUT", NULL);
+	r |= clp_add_flag("-q", cmd_none, flag_quiet, flg_func);
+	r |= clp_add_flg_description(cmd_none, flag_quiet, "quiet mode", NULL);
+	r |= clp_add_flag("-r", cmd_none, flag_reverse, flg_func);
+	r |= clp_add_flg_description(cmd_none, flag_reverse, "reverse the format of the output", NULL);
+	r |= clp_add_flag("-s", cmd_none, flag_string, flg_func);
+	r |= clp_add_flg_description(cmd_none, flag_string, "print the sum of the given string", NULL);
+	r = (r == clp_success) ? clp_parse(argc, argv) : r;
 	if (r != clp_success) {
 		process_clp_result(r);
 		return (1);
