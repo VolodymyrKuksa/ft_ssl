@@ -50,7 +50,7 @@ typedef struct	s_clp_flag
 }				t_clp_flag;
 
 typedef t_clp_result	(t_clp_cmd_func)(int flags,
-						t_clp_cmd_arguments const *arg);
+						t_clp_cmd_arguments const *arg, int pos);
 
 typedef struct	s_clp_command
 {

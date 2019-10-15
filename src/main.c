@@ -38,7 +38,7 @@ void			append_bytes(char **dst, size_t const dst_size,
 	*dst = result_bytes;
 }
 
-void			read_stdin(char** bytes, size_t* bytes_size)
+void			read_fd(int fd, char** bytes, size_t* bytes_size)
 {
 	char	*input_buff;
 	size_t	n;
@@ -54,7 +54,7 @@ void			read_stdin(char** bytes, size_t* bytes_size)
 	n = 1;
 	while (n > 0)
 	{
-		n = read(0, input_buff, INPUT_BUFFER_SIZE);
+		n = read(fd, input_buff, INPUT_BUFFER_SIZE);
 		append_bytes(bytes, *bytes_size, input_buff, n);
 		if (!*bytes)
 		{
@@ -92,37 +92,57 @@ char			*to_hex(unsigned char *bytes, size_t size)
 	return (result);
 }
 
-void			execute_hash_function(unsigned char* input, size_t input_size,
-		unsigned char* (*f)(const unsigned char*, size_t), size_t hash_size)
+char		*execute_hash_function(unsigned char* input, size_t input_size,
+			unsigned char* (*f)(const unsigned char*, size_t), size_t hash_size)
 {
 	unsigned char	*hash;
 	char			*output;
 
 	hash = f(input, input_size);
 	output = to_hex(hash, hash_size);
-	ft_putendl(output);
-	free(output);
 	free(hash);
+	return (output);
 }
 
-t_clp_result	md5_func(int flags, t_clp_cmd_arguments const *arg)
+char		*execute_hash_function_by_command(unsigned char *input,
+			size_t input_size, t_cmd_id cmd)
+{
+	static size_t			s_hash_size[] = {16, 32};
+	static unsigned char	*(*s_function[])(const unsigned char*, size_t) =
+							{md5, sha256};
+	unsigned char			*hash;
+	char					*output;
+
+	hash = s_function[cmd](input, input_size);
+	output = to_hex(hash, s_hash_size[cmd]);
+	free(hash);
+	return (output);
+}
+
+t_clp_result	md5_func(int flags, t_clp_cmd_arguments const *arg, int pos)
 {
 	char			*input;
+	char 			*output;
 	size_t			input_size;
 
-	read_stdin(&input, &input_size);
-	execute_hash_function((unsigned char*)input, input_size, md5, 16);
+	read_fd(0, &input, &input_size);
+	output = execute_hash_function((unsigned char*)input, input_size, md5, 16);
+//	ft_putendl(output);
+	free(output);
 	free(input);
 	return clp_success;
 }
 
-t_clp_result	sha256_func(int flags, t_clp_cmd_arguments const *arg)
+t_clp_result	sha256_func(int flags, t_clp_cmd_arguments const *arg, int pos)
 {
 	char			*input;
+	char 			*output;
 	size_t			input_size;
 
-	read_stdin(&input, &input_size);
-	execute_hash_function((unsigned char*)input, input_size, sha256, 32);
+	read_fd(0, &input, &input_size);
+	output = execute_hash_function((unsigned char*)input, input_size, sha256, 32);
+//	ft_putendl(output);
+	free(output);
 	free(input);
 	return clp_success;
 }
@@ -140,6 +160,26 @@ t_clp_result	flg_func(int cmd_id, int prev_flags,
 	if (prev_flags & flag_string)
 		printf("-s ");
 	printf("] cmd: %d; pos: %d}\n", cmd_id, pos);
+	return clp_success;
+}
+
+t_clp_result	flg_print_func(int cmd_id, int prev_flags,
+				t_clp_cmd_arguments const *arg, int pos)
+{
+	char			*input;
+	char			*output;
+	size_t			input_size;
+
+	(void)prev_flags;
+	(void)arg;
+	(void)pos;
+	read_fd(0, &input, &input_size);
+	output = execute_hash_function_by_command((unsigned char*)input, input_size,
+			cmd_id);
+	write(1, input, input_size);
+	ft_putendl(output);
+	free(input);
+	free(output);
 	return clp_success;
 }
 
@@ -167,7 +207,7 @@ int		main(int argc, char **argv)
 	r |= clp_add_cmd_description(cmd_md5, "Execute MD5 hashing algorithm", NULL);
 	r |= clp_add_command("sha256", cmd_sha256, sha256_func);
 	r |= clp_add_cmd_description(cmd_sha256, "Execute SHA256 hashing algorithm", NULL);
-	r |= clp_add_flag("-p", cmd_none, flag_print, flg_func);
+	r |= clp_add_flag("-p", cmd_none, flag_print, flg_print_func);
 	r |= clp_add_flg_description(cmd_none, flag_print, "echo STDIN to STDOUT and append the checksum to STDOUT", NULL);
 	r |= clp_add_flag("-q", cmd_none, flag_quiet, flg_func);
 	r |= clp_add_flg_description(cmd_none, flag_quiet, "quiet mode", NULL);

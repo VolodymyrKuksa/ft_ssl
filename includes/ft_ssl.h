@@ -15,18 +15,18 @@
 
 # include "data_types.h"
 
-typedef enum	e_command_line_flags {
+typedef enum	e_command_line_flag {
 	flag_print = 1 << 0,
 	flag_quiet = 1 << 1,
 	flag_reverse = 1 << 2,
 	flag_string = 1 << 3
-}				t_cmd_flags;
+}				t_cmd_flag;
 
-typedef enum	e_command_identifiers {
+typedef enum	e_command_identifier {
 	cmd_none = -1,
 	cmd_md5,
 	cmd_sha256
-}				t_cmd_ids;
+}				t_cmd_id;
 
 # define INPUT_BUFFER_SIZE 2048
 

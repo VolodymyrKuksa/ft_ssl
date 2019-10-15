@@ -38,7 +38,7 @@ t_clp_result	clp_parse_internal(int argc, char **argv)
 		flags |= flag->param.identifier;
 		++i;
 	}
-	return (cmd->function(flags, &arg));
+	return (cmd->function(flags, &arg, i));
 }
 
 t_clp_result	clp_parse(int argc, char **argv)
