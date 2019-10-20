@@ -41,7 +41,7 @@ typedef struct	s_clp_cmd_arguments
 }				t_clp_cmd_arguments;
 
 typedef t_clp_result	(t_clp_flag_func)(int cmd, int prev_flags,
-						t_clp_cmd_arguments const *arg, int pos);
+						t_clp_cmd_arguments const *arg, int *pos);
 
 typedef struct	s_clp_flag
 {
@@ -49,7 +49,7 @@ typedef struct	s_clp_flag
 	t_clp_flag_func	*function;
 }				t_clp_flag;
 
-typedef t_clp_result	(t_clp_cmd_func)(int flags,
+typedef t_clp_result	(t_clp_cmd_func)(int cmd, int flags,
 						t_clp_cmd_arguments const *arg, int pos);
 
 typedef struct	s_clp_command

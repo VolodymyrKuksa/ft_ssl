@@ -15,35 +15,44 @@
 
 extern t_clp_app	*g_app;
 
-t_clp_result	clp_parse_internal(int argc, char **argv)
+t_clp_result	clp_parse_internal(t_clp_cmd_arguments	arg)
 {
 	t_clp_cmd			*cmd;
 	t_clp_flag			*flag;
-	t_clp_cmd_arguments	arg;
 	int					flags;
 	int					i;
+	t_clp_result		r;
 
-	arg.count = argc;
-	arg.vector = argv;
-	if (argc == 1 || !(cmd = clp_get_cmd(argv[1])))
+	if (arg.count == 1 || !(cmd = clp_get_cmd(arg.vector[1])))
 		return (clp_unknown_command_name);
 	flags = 0;
 	i = 2;
-	while (i < argc)
+	while (i < arg.count)
 	{
-		if (!(flag = clp_get_cmd_flag(argv[i], cmd)) &&
-		!(flag = clp_get_flag(argv[i])))
+		if (!(flag = clp_get_cmd_flag(arg.vector[i], cmd)) &&
+		!(flag = clp_get_flag(arg.vector[i])))
 			break ;
-		flag->function(cmd->param.identifier, flags, &arg, i);
+		if (flag->function)
+		{
+			r = flag->function(cmd->param.identifier, flags, &arg, &i);
+			if (r != clp_success)
+				return (r);
+		}
 		flags |= flag->param.identifier;
 		++i;
 	}
-	return (cmd->function(flags, &arg, i));
+	return (cmd->function(cmd->param.identifier, flags, &arg, i));
 }
 
 t_clp_result	clp_parse(int argc, char **argv)
 {
-	if (clp_parse_internal(argc, argv) != clp_success)
+	t_clp_cmd_arguments		arg;
+	t_clp_result			r;
+
+	arg.count = argc;
+	arg.vector = argv;
+	r = clp_parse_internal(arg);
+	if (r == clp_failure)
 		return (clp_print_usage(argv[0]));
 	return (clp_success);
 }

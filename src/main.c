@@ -119,38 +119,28 @@ char		*execute_hash_function_by_command(unsigned char *input,
 	return (output);
 }
 
-t_clp_result	md5_func(int flags, t_clp_cmd_arguments const *arg, int pos)
+t_clp_result	cmd_func(int cmd_id, int flags,
+		t_clp_cmd_arguments const *arg, int pos)
 {
 	char			*input;
 	char 			*output;
 	size_t			input_size;
+	int				fd;
 
+	if (flags & flag_string)
+		return (clp_success);
 	read_fd(0, &input, &input_size);
-	output = execute_hash_function((unsigned char*)input, input_size, md5, 16);
-//	ft_putendl(output);
+	output = execute_hash_function_by_command((unsigned char*)input, input_size,
+			cmd_id);
 	free(output);
 	free(input);
-	return clp_success;
-}
-
-t_clp_result	sha256_func(int flags, t_clp_cmd_arguments const *arg, int pos)
-{
-	char			*input;
-	char 			*output;
-	size_t			input_size;
-
-	read_fd(0, &input, &input_size);
-	output = execute_hash_function((unsigned char*)input, input_size, sha256, 32);
-//	ft_putendl(output);
-	free(output);
-	free(input);
-	return clp_success;
+	return (clp_success);
 }
 
 t_clp_result	flg_func(int cmd_id, int prev_flags,
-				t_clp_cmd_arguments const *arg, int pos)
+				t_clp_cmd_arguments const *arg, int *pos)
 {
-	printf("<%s>{prev_flags: [ ", arg->vector[pos]);
+	printf("<%s>{prev_flags: [ ", arg->vector[*pos]);
 	if (prev_flags & flag_print)
 		printf("-p ");
 	if (prev_flags & flag_quiet)
@@ -159,12 +149,12 @@ t_clp_result	flg_func(int cmd_id, int prev_flags,
 		printf("-r ");
 	if (prev_flags & flag_string)
 		printf("-s ");
-	printf("] cmd: %d; pos: %d}\n", cmd_id, pos);
+	printf("] cmd: %d; pos: %d}\n", cmd_id, *pos);
 	return clp_success;
 }
 
 t_clp_result	flg_print_func(int cmd_id, int prev_flags,
-				t_clp_cmd_arguments const *arg, int pos)
+				t_clp_cmd_arguments const *arg, int *pos)
 {
 	char			*input;
 	char			*output;
@@ -180,7 +170,34 @@ t_clp_result	flg_print_func(int cmd_id, int prev_flags,
 	ft_putendl(output);
 	free(input);
 	free(output);
-	return clp_success;
+	return (clp_success);
+}
+
+t_clp_result	flg_string_func(int cmd_id, int prev_flags,
+				t_clp_cmd_arguments const *arg, int *pos)
+{
+	char			*input;
+	char			*output;
+	size_t			input_size;
+
+	(void)prev_flags;
+	if ((*pos + 1) >= arg->count)
+		return (clp_failure);
+	input = ft_strdup(arg->vector[*pos + 1]);
+	input_size = ft_strlen(input);
+	output = execute_hash_function_by_command((unsigned char*)input, input_size,
+			cmd_id);
+	if (!(prev_flags & flag_quiet))
+	{
+		ft_putstr(cmd_id == cmd_md5 ? "MD5 (\"" : "SHA256 (\"");
+		ft_putstr(input);
+		ft_putstr("\") = ");
+	}
+	ft_putendl(output);
+	free(output);
+	free(input);
+	++(*pos);
+	return (clp_success);
 }
 
 void	process_clp_result(t_clp_result result)
@@ -203,17 +220,17 @@ int		main(int argc, char **argv)
 	t_clp_result	r;
 
 	r = 0;
-	r |= clp_add_command("md5", cmd_md5, md5_func);
+	r |= clp_add_command("md5", cmd_md5, cmd_func);
 	r |= clp_add_cmd_description(cmd_md5, "Execute MD5 hashing algorithm", NULL);
-	r |= clp_add_command("sha256", cmd_sha256, sha256_func);
+	r |= clp_add_command("sha256", cmd_sha256, cmd_func);
 	r |= clp_add_cmd_description(cmd_sha256, "Execute SHA256 hashing algorithm", NULL);
 	r |= clp_add_flag("-p", cmd_none, flag_print, flg_print_func);
 	r |= clp_add_flg_description(cmd_none, flag_print, "echo STDIN to STDOUT and append the checksum to STDOUT", NULL);
-	r |= clp_add_flag("-q", cmd_none, flag_quiet, flg_func);
+	r |= clp_add_flag("-q", cmd_none, flag_quiet, NULL);
 	r |= clp_add_flg_description(cmd_none, flag_quiet, "quiet mode", NULL);
 	r |= clp_add_flag("-r", cmd_none, flag_reverse, flg_func);
 	r |= clp_add_flg_description(cmd_none, flag_reverse, "reverse the format of the output", NULL);
-	r |= clp_add_flag("-s", cmd_none, flag_string, flg_func);
+	r |= clp_add_flag("-s", cmd_none, flag_string, flg_string_func);
 	r |= clp_add_flg_description(cmd_none, flag_string, "print the sum of the given string", NULL);
 	r = (r == clp_success) ? clp_parse(argc, argv) : r;
 	if (r != clp_success) {
