@@ -15,7 +15,7 @@
 
 extern t_clp_app	*g_app;
 
-t_clp_result	clp_parse_internal(t_clp_cmd_arguments	arg)
+t_clp_result	clp_parse_internal(t_clp_cmd_arguments arg)
 {
 	t_clp_cmd			*cmd;
 	t_clp_flag			*flag;

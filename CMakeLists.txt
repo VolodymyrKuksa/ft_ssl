@@ -26,7 +26,10 @@ set(SOURCE_FILES
         src/sha256/sha256.c
         includes/sha256.h
         src/sha256/sha256_constants.c
-        src/endianness_utils.c)
+        src/endianness_utils.c
+        src/execute_hash_function.c
+        src/io.c
+        src/clp_functions.c)
 
 set(INCLUDE_DIRECTORIES
         includes
