@@ -52,7 +52,7 @@ t_clp_result	clp_parse(int argc, char **argv)
 	arg.count = argc;
 	arg.vector = argv;
 	r = clp_parse_internal(arg);
-	if (r == clp_failure)
+	if (r != clp_success)
 		return (clp_print_usage(argv[0]));
 	return (clp_success);
 }

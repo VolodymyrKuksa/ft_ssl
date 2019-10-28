@@ -10,6 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <fcntl.h>
 #include "stdio.h"//
 
 #include "ft_ssl.h"
@@ -20,6 +21,51 @@
 #include "libft.h"
 #include "clp.h"
 
+void			output_result_string(const char *input, const char* output,
+							  int prev_flags, int cmd_id)
+{
+	if (prev_flags & flag_quiet)
+	{
+		ft_putendl(output);
+	}
+	else if (prev_flags & flag_reverse)
+	{
+		ft_putstr(output);
+		ft_putstr(" \"");
+		ft_putstr(input);
+		ft_putendl("\"");
+	}
+	else
+	{
+		ft_putstr(cmd_id == cmd_md5 ? "MD5 (\"" : "SHA256 (\"");
+		ft_putstr(input);
+		ft_putstr("\") = ");
+		ft_putendl(output);
+	}
+}
+
+void			output_result_file(const char *input, const char* output,
+							  int prev_flags, int cmd_id)
+{
+	if (prev_flags & flag_quiet)
+	{
+		ft_putendl(output);
+	}
+	else if (prev_flags & flag_reverse)
+	{
+		ft_putstr(output);
+		ft_putstr(" ");
+		ft_putendl(input);
+	}
+	else
+	{
+		ft_putstr(cmd_id == cmd_md5 ? "MD5 (" : "SHA256 (");
+		ft_putstr(input);
+		ft_putstr(") = ");
+		ft_putendl(output);
+	}
+}
+
 void			append_bytes(char **dst, size_t const dst_size,
 		char const *src, size_t const src_size)
 {
@@ -29,18 +75,20 @@ void			append_bytes(char **dst, size_t const dst_size,
 		return ;
 	if (!(result_bytes = (char*)malloc(dst_size + src_size)))
 	{
+		free(*dst);
 		*dst = NULL;
 		return ;
 	}
-	ft_memcpy(result_bytes, dst, dst_size);
+	ft_memcpy(result_bytes, *dst, dst_size);
 	ft_memcpy(result_bytes + dst_size, src, src_size);
 	free(*dst);
 	*dst = result_bytes;
 }
 
-void			read_fd(int fd, char** bytes, size_t* bytes_size)
+char*			read_fd(int fd, size_t* bytes_size)
 {
 	char	*input_buff;
+	char	*bytes;
 	size_t	n;
 
 	if (!(input_buff = (char*)malloc(INPUT_BUFFER_SIZE)))
@@ -50,13 +98,13 @@ void			read_fd(int fd, char** bytes, size_t* bytes_size)
 	}
 
 	*bytes_size = 0;
-	*bytes = (char*)malloc(*bytes_size);
+	bytes = (char*)malloc(*bytes_size);
 	n = 1;
 	while (n > 0)
 	{
 		n = read(fd, input_buff, INPUT_BUFFER_SIZE);
-		append_bytes(bytes, *bytes_size, input_buff, n);
-		if (!*bytes)
+		append_bytes(&bytes, *bytes_size, input_buff, n);
+		if (!bytes)
 		{
 			ft_putendl("Memory allocation fail when reading input");
 			exit(1);
@@ -65,6 +113,7 @@ void			read_fd(int fd, char** bytes, size_t* bytes_size)
 	}
 
 	free(input_buff);
+	return (bytes);
 }
 
 char			*to_hex(unsigned char *bytes, size_t size)
@@ -92,18 +141,6 @@ char			*to_hex(unsigned char *bytes, size_t size)
 	return (result);
 }
 
-char		*execute_hash_function(unsigned char* input, size_t input_size,
-			unsigned char* (*f)(const unsigned char*, size_t), size_t hash_size)
-{
-	unsigned char	*hash;
-	char			*output;
-
-	hash = f(input, input_size);
-	output = to_hex(hash, hash_size);
-	free(hash);
-	return (output);
-}
-
 char		*execute_hash_function_by_command(unsigned char *input,
 			size_t input_size, t_cmd_id cmd)
 {
@@ -119,38 +156,57 @@ char		*execute_hash_function_by_command(unsigned char *input,
 	return (output);
 }
 
+t_clp_result	process_params(int cmd_id, int flags,
+		t_clp_cmd_arguments const* arg, int pos)
+{
+	char			*input;
+	char 			*output;
+	size_t			input_size;
+	int	fd;
+
+	while (pos < arg->count)
+	{
+		fd = open(arg->vector[pos], O_RDONLY);
+		if (fd == -1)
+		{
+			ft_putstr("Unable to open file ");
+			ft_putendl(arg->vector[pos]);
+		}
+		else
+		{
+			input = read_fd(fd, &input_size);
+			output = execute_hash_function_by_command((unsigned char*)input,
+				input_size, cmd_id);
+			output_result_file(arg->vector[pos], output, flags, cmd_id);
+			free(output);
+			free(input);
+		}
+		++pos;
+	}
+	return (clp_success);
+}
+
 t_clp_result	cmd_func(int cmd_id, int flags,
 		t_clp_cmd_arguments const *arg, int pos)
 {
 	char			*input;
 	char 			*output;
 	size_t			input_size;
-	int				fd;
 
 	if (flags & flag_string)
 		return (clp_success);
-	read_fd(0, &input, &input_size);
-	output = execute_hash_function_by_command((unsigned char*)input, input_size,
-			cmd_id);
-	free(output);
-	free(input);
+	else if (pos < arg->count)
+		return (process_params(cmd_id, flags, arg, pos));
+	else if (!(flags & flag_print) && !(flags & flag_string))
+	{
+		input = read_fd(0, &input_size);
+		output = execute_hash_function_by_command((unsigned char*)input,
+				input_size, cmd_id);
+		ft_putendl(output);
+		free(output);
+		free(input);
+	}
 	return (clp_success);
-}
-
-t_clp_result	flg_func(int cmd_id, int prev_flags,
-				t_clp_cmd_arguments const *arg, int *pos)
-{
-	printf("<%s>{prev_flags: [ ", arg->vector[*pos]);
-	if (prev_flags & flag_print)
-		printf("-p ");
-	if (prev_flags & flag_quiet)
-		printf("-q ");
-	if (prev_flags & flag_reverse)
-		printf("-r ");
-	if (prev_flags & flag_string)
-		printf("-s ");
-	printf("] cmd: %d; pos: %d}\n", cmd_id, *pos);
-	return clp_success;
 }
 
 t_clp_result	flg_print_func(int cmd_id, int prev_flags,
@@ -163,10 +219,13 @@ t_clp_result	flg_print_func(int cmd_id, int prev_flags,
 	(void)prev_flags;
 	(void)arg;
 	(void)pos;
-	read_fd(0, &input, &input_size);
+	input = read_fd(0, &input_size);
 	output = execute_hash_function_by_command((unsigned char*)input, input_size,
 			cmd_id);
-	write(1, input, input_size);
+	if (!(prev_flags & flag_quiet))
+	{
+		write(1, input, input_size);
+	}
 	ft_putendl(output);
 	free(input);
 	free(output);
@@ -187,13 +246,7 @@ t_clp_result	flg_string_func(int cmd_id, int prev_flags,
 	input_size = ft_strlen(input);
 	output = execute_hash_function_by_command((unsigned char*)input, input_size,
 			cmd_id);
-	if (!(prev_flags & flag_quiet))
-	{
-		ft_putstr(cmd_id == cmd_md5 ? "MD5 (\"" : "SHA256 (\"");
-		ft_putstr(input);
-		ft_putstr("\") = ");
-	}
-	ft_putendl(output);
+	output_result_string(input, output, prev_flags, cmd_id);
 	free(output);
 	free(input);
 	++(*pos);
@@ -228,7 +281,7 @@ int		main(int argc, char **argv)
 	r |= clp_add_flg_description(cmd_none, flag_print, "echo STDIN to STDOUT and append the checksum to STDOUT", NULL);
 	r |= clp_add_flag("-q", cmd_none, flag_quiet, NULL);
 	r |= clp_add_flg_description(cmd_none, flag_quiet, "quiet mode", NULL);
-	r |= clp_add_flag("-r", cmd_none, flag_reverse, flg_func);
+	r |= clp_add_flag("-r", cmd_none, flag_reverse, NULL);
 	r |= clp_add_flg_description(cmd_none, flag_reverse, "reverse the format of the output", NULL);
 	r |= clp_add_flag("-s", cmd_none, flag_string, flg_string_func);
 	r |= clp_add_flg_description(cmd_none, flag_string, "print the sum of the given string", NULL);
