@@ -27,13 +27,13 @@ ft_tolower.c ft_toupper.c get_next_line.c
 
 INCFILES = libft.h get_next_line.h
 
-SRC_DIR = src/
-OBJ_DIR = obj/
-INC_DIR = includes/
+SRC_DIR = src
+OBJ_DIR = obj
+INC_DIR = includes
 
-SRC = $(addprefix $(SRC_DIR), $(CFILES))
-OBJ = $(addprefix $(OBJ_DIR), $(CFILES:.c=.o))
-INC = $(addprefix $(INC_DIR), $(INCFILES))
+SRC = $(addprefix $(SRC_DIR)/, $(CFILES))
+OBJ = $(addprefix $(OBJ_DIR)/, $(CFILES:.c=.o))
+INC = $(addprefix $(INC_DIR)/, $(INCFILES))
 
 CC = clang
 FLAGS = -Wall -Werror -Wextra
@@ -57,7 +57,7 @@ $(OBJ_DIR):
 	@mkdir $@
 	@printf "%-$(SP1)s%-$(SP2)s$(C_GREEN)[done]$(C_NONE)\n" $(NAME): $@
 
-$(OBJ_DIR)%.o : $(SRC_DIR)%.c $(INC)
+$(OBJ_DIR)/%.o : $(SRC_DIR)/%.c $(INC)
 	@$(CC) -c -I $(INC_DIR) $(FLAGS) $< -o $@
 	@printf "%-$(SP1)s%-$(SP2)s$(C_GREEN)[done]$(C_NONE)\n" $(NAME): $@
 

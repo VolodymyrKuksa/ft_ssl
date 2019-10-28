@@ -22,9 +22,9 @@ execute_hash_function.c io.c clp_functions.c
 
 INCFILES = data_types.h ft_ssl.h md5.h sha256.h
 
-SRC_DIR = src/
-OBJ_DIR = obj/
-INC_DIR = includes/
+SRC_DIR = src
+OBJ_DIR = obj
+INC_DIR = includes
 
 LFT_DIR = libft
 LFT_INC_DIR = $(LFT_DIR)/includes
@@ -34,9 +34,9 @@ CLP_DIR = command_line_parser
 CLP_INC_DIR = $(CLP_DIR)/includes
 CLP_LIB = $(CLP_DIR)/clp.a
 
-SRC = $(addprefix $(SRC_DIR), $(CFILES))
-OBJ = $(addprefix $(OBJ_DIR), $(CFILES:.c=.o))
-INC = $(addprefix $(INC_DIR), $(INCFILES))
+SRC = $(addprefix $(SRC_DIR)/, $(CFILES))
+OBJ = $(addprefix $(OBJ_DIR)/, $(CFILES:.c=.o))
+INC = $(addprefix $(INC_DIR)/, $(INCFILES))
 
 CC = clang
 FLAGS = -Wall -Werror -Wextra
@@ -76,7 +76,7 @@ $(OBJ_DIR)/$(SHA256_DIR):
 	@mkdir $@
 	@printf "%-$(SP1)s%-$(SP2)s$(C_GREEN)[done]$(C_NONE)\n" $(NAME): $@
 
-$(OBJ_DIR)%.o : $(SRC_DIR)%.c $(INC)
+$(OBJ_DIR)/%.o : $(SRC_DIR)/%.c $(INC)
 	@$(CC) -c -I $(INC_DIR) -I $(LFT_INC_DIR) -I $(CLP_INC_DIR) $(FLAGS) \
 	$< -o $@
 	@printf "%-$(SP1)s%-$(SP2)s$(C_GREEN)[done]$(C_NONE)\n" $(NAME): $@
