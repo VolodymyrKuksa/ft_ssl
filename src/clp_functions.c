@@ -27,7 +27,7 @@ t_clp_result	process_params(int cmd_id, int flags,
 		fd = open(arg->vector[pos], O_RDONLY);
 		if (fd == -1 || read(fd, NULL, 0) != 0)
 		{
-			ft_putstr("Unable to open file ");
+			ft_putstr("Unable to open file: ");
 			ft_putendl(arg->vector[pos]);
 		}
 		else

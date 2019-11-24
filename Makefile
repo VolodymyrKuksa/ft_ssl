@@ -102,6 +102,6 @@ norm:
 
 test: $(NAME)
 	@printf "\n%s: $(C_GREEN)[MD5]$(C_NONE)\n" $@
-	@sh test_md5.sh
+	@sh test.sh md5
 	@printf "\n%s: $(C_GREEN)[SHA256]$(C_NONE)\n" $@
-	@sh test_sha256.sh
+	@sh test.sh sha256
