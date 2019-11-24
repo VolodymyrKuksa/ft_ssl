@@ -1,3 +1,10 @@
 cmake-build-debug/
 .DS_Store
 .idea
+
+command_line_parser/clp.a
+command_line_parser/obj/
+ft_ssl
+libft/libft.a
+libft/obj/
+obj/
