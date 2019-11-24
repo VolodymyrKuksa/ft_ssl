@@ -100,7 +100,7 @@ norm:
 	@make -C $(CLP_DIR) norm
 	norminette $(SRC_DIR) $(INC_DIR)
 
-test:
+test: $(NAME)
 	@printf "\n%s: $(C_GREEN)[MD5]$(C_NONE)\n" $@
 	@sh test_md5.sh
 	@printf "\n%s: $(C_GREEN)[SHA256]$(C_NONE)\n" $@
