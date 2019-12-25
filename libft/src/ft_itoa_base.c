@@ -33,12 +33,11 @@ static int	ft_count_len(unsigned int nb, int base, int sign)
 
 static char	*ft_convert(unsigned int nb, int base, int sign)
 {
-	char	*res;
-	char	*str_base;
-	int		i;
+	char				*res;
+	static const char	*str_base = "0123456789abcdef";
+	int					i;
 
 	i = ft_count_len(nb, base, sign);
-	str_base = ft_strdup("0123456789abcdef");
 	res = ft_strnew((size_t)i);
 	if (!res)
 		return (NULL);
