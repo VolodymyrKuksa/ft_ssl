@@ -124,6 +124,7 @@ unsigned char		*sha256(unsigned char const *const msg, size_t len)
 	if (endianness)
 		reverse_endianness(padded_message, len + sizeof(t_word));
 	result = sha256_main_logic(padded_message, padded_length);
+	free(padded_message);
 	free(message);
 	if (endianness)
 		reverse_endianness(result, 32);

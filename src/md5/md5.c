@@ -87,6 +87,7 @@ unsigned char	*md5(unsigned char const *const msg, size_t len)
 	if (!is_little_endian())
 		reverse_endianness(padded_message, len + sizeof(t_word));
 	result = md5_main_logic(padded_message, padded_length);
+	free(padded_message);
 	free(message);
 	return (result);
 }
